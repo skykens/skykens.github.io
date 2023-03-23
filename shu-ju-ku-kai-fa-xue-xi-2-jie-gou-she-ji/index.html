@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="ch" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>数据库开发学习 (2)  结构设计 | 现役程序员skykens的博客</title><meta name="author" content="Skykens,bohemia0508@gmail.com"><meta name="copyright" content="Skykens"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="业务数据库设计流程需求分析分析—&gt;概要设计—&gt;详细设计 瀑布模型和螺旋模型 瀑布模型: 只有往下迭代开发,没有回溯.多适合用于业务需求十分明确可以一次性完成开发 螺旋模型: 有回溯,多次迭代开发.每次开发仅完成一部分的内容,与瀑布模型相反,用敏捷开发快速迭代出一版,适用于业务需求并不明确. 宽表模式将属性全部列在一个表中 缺点   数据冗余,相同数据出现多次 维护成本高 更新异常 插入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库开发学习 (2)  结构设计">
+<meta property="og:url" content="https://skykens.github.io/shu-ju-ku-kai-fa-xue-xi-2-jie-gou-she-ji/index.html">
+<meta property="og:site_name" content="现役程序员skykens的博客">
+<meta property="og:description" content="业务数据库设计流程需求分析分析—&gt;概要设计—&gt;详细设计 瀑布模型和螺旋模型 瀑布模型: 只有往下迭代开发,没有回溯.多适合用于业务需求十分明确可以一次性完成开发 螺旋模型: 有回溯,多次迭代开发.每次开发仅完成一部分的内容,与瀑布模型相反,用敏捷开发快速迭代出一版,适用于业务需求并不明确. 宽表模式将属性全部列在一个表中 缺点   数据冗余,相同数据出现多次 维护成本高 更新异常 插入">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-48vj8o.jpg">
+<meta property="article:published_time" content="2020-01-04T14:26:00.000Z">
+<meta property="article:modified_time" content="2020-01-19T20:25:22.000Z">
+<meta property="article:author" content="Skykens">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-48vj8o.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://skykens.github.io/shu-ju-ku-kai-fa-xue-xi-2-jie-gou-she-ji/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Skykens","link":"Link: ","source":"Source: 现役程序员skykens的博客","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"Traditional Chinese Activated Manually","cht_to_chs":"Simplified Chinese Activated Manually","day_to_night":"Dark Mode Activated Manually","night_to_day":"Light Mode Activated Manually","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '数据库开发学习 (2)  结构设计',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2020-01-19 20:25:22'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="现役程序员skykens的博客" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">99</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">17</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目錄</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-48vj8o.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">现役程序员skykens的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目錄</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">数据库开发学习 (2)  结构设计</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2020-01-04T14:26:00.000Z" title="Created 2020-01-04 14:26:00">2020-01-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-01-19T20:25:22.000Z" title="Updated 2020-01-19 20:25:22">2020-01-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="数据库开发学习 (2)  结构设计"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>业务数据库设计流程<br>需求分析分析—&gt;概要设计—&gt;详细设计</p>
+<p>瀑布模型和螺旋模型</p>
+<p>瀑布模型: 只有往下迭代开发,没有回溯.多适合用于业务需求十分明确可以一次性完成开发</p>
+<p>螺旋模型: 有回溯,多次迭代开发.每次开发仅完成一部分的内容,与瀑布模型相反,用敏捷开发快速迭代出一版,适用于业务需求并不明确.</p>
+<p>宽表模式<br>将属性全部列在一个表中</p>
+<p>缺点 </p>
+<ol>
+<li>数据冗余,相同数据出现多次</li>
+<li>维护成本高</li>
+<li>更新异常</li>
+<li>插入异常: 部分数据由于缺失主键信息而不得显示</li>
+<li>删除异常: 删除某一数据时不得不删除另一数据</li>
+</ol>
+<p>适用场景<br>配合列存储的数据报表应用</p>
+<p>逻辑设计: 数据库设计范式</p>
+<p>第一范式: 表中的所有字段都是不可再分的</p>
+<p>第二范式: 表中必须存在业务主键(能够唯一标识出每一行业务数据的列或者列的组合),并且非主键依赖于全部业务主键,意味着列非主键不能只依赖于组合业务主键中的某一个主属性</p>
+<p>第三范式: 表中的非主键列之间不能相互依赖.(传递依赖),第三范式的目的就是为了让非主键列的字段只完全依赖于主键列,与其他列无关.</p>
+<p>ER图:实体关系图,</p>
+<p>属性语法</p>
+<p>复合属性是多个属性的组合</p>
+<p>多值属性是某个属性可以有多个不同的取值</p>
+<p>派生属性是不保存在实体中的属性,用虚线绘制</p>
+<p>可选属性是允许有空值的属性(在名字下方增加”(0)”  )</p>
+<p>主键字段由下划线标识</p>
+<p>实体关系语法</p>
+<p>一对一关系</p>
+<p>一对多关系</p>
+<p>MySQL存储引擎<br>|  引擎名称   |   支持事务  |  说明 |<br>|  —-  | —-  | —- |<br>| MyISAM  | No | 不具备事务机制,不具备多线程访问,串行执行SQL语句 |<br>| CSV引擎  | No | 以CSV格式存储的非事务型存储引擎|<br>| Memory  | No |存储于内存中的易失型非事务型存储引擎|<br>| Archive   |No| 只允许查询和新增数据而不允许修改的非事务型存储引擎|<br>| InnoDB   |Yes |最常用,支持事务机制,适合写多读多,支持多线程读写,在多线程读写的时候是用行锁而不是MyISAM引擎的表锁<br>| TokuDB   |Yes |支持事务机制,适合写多读少.</p>
+<p>InoDB引擎特点</p>
+<ol>
+<li>事务型存储引擎支持ACID</li>
+<li>数据按主键聚集存储: 按照主键顺序存储</li>
+<li>支持行级锁及MVCC(多版本的并发控制)</li>
+<li>支持B树和自适应Hash索引</li>
+<li>支持全文和空间索引</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:bohemia0508@gmail.com">Skykens</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://skykens.github.io/shu-ju-ku-kai-fa-xue-xi-2-jie-gou-she-ji/">https://skykens.github.io/shu-ju-ku-kai-fa-xue-xi-2-jie-gou-she-ji/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-48vj8o.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/bing-cha-ji/"><img class="prev-cover" src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-ox2dg7.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">并查集</div></div></a></div><div class="next-post pull-right"><a href="/shu-ju-ku-kai-fa-xue-xi-1-shu-ju-ku-gai-shu/"><img class="next-cover" src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-0q5yq0.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">数据库开发学习 (1) 数据库概述</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/head.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Skykens</div><div class="author-info__description"> 分享后端开发相关知识、复盘、个人观点，愿君喜欢。</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">99</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">17</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/skykens"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/skykens" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="skykens:470798745@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">2020年,关键词:疫情,求职,进入腾讯
+2021年,关键词:入职,异地,迷茫
+2022年,学习,改变,写作自由,离开
+2023年,关键词:新城市,思念,深耕,代码自由</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/undefined-symbol-ke-neng-de-wen-ti/" title="undefined symbol 可能的问题"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-zxg76o.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="undefined symbol 可能的问题"/></a><div class="content"><a class="title" href="/undefined-symbol-ke-neng-de-wen-ti/" title="undefined symbol 可能的问题">undefined symbol 可能的问题</a><time datetime="2023-03-23T22:01:00.000Z" title="Created 2023-03-23 22:01:00">2023-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/" title="开箱即用的开发环境"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-6oqzgq.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="开箱即用的开发环境"/></a><div class="content"><a class="title" href="/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/" title="开箱即用的开发环境">开箱即用的开发环境</a><time datetime="2023-03-23T00:16:00.000Z" title="Created 2023-03-23 00:16:00">2023-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/" title="漫谈VCS在游戏中的使用"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-6oqzgq.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="漫谈VCS在游戏中的使用"/></a><div class="content"><a class="title" href="/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/" title="漫谈VCS在游戏中的使用">漫谈VCS在游戏中的使用</a><time datetime="2023-03-18T00:01:00.000Z" title="Created 2023-03-18 00:01:00">2023-03-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/" title="关于通过cp覆盖so导致coredump"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-dgpvzl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="关于通过cp覆盖so导致coredump"/></a><div class="content"><a class="title" href="/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/" title="关于通过cp覆盖so导致coredump">关于通过cp覆盖so导致coredump</a><time datetime="2021-07-08T10:20:27.000Z" title="Created 2021-07-08 10:20:27">2021-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/" title="Kubernetes学习笔记0-从零搭建k8s集群"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-5dx6w7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes学习笔记0-从零搭建k8s集群"/></a><div class="content"><a class="title" href="/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/" title="Kubernetes学习笔记0-从零搭建k8s集群">Kubernetes学习笔记0-从零搭建k8s集群</a><time datetime="2021-06-30T15:20:27.000Z" title="Created 2021-06-30 15:20:27">2021-06-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2023 By Skykens</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://butterfly.js.org/">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'AmW91X1WNrKyj5Y7sCfuj4v3-gzGzoHsz',
+      appKey: '4SoS7HRckX0IlgpKVJcVSpsP',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

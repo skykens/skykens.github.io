@@ -1,0 +1,722 @@
+<!DOCTYPE html><html lang="ch" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>深入理解select 模型     （源码分析 ） | 现役程序员skykens的博客</title><meta name="author" content="Skykens,bohemia0508@gmail.com"><meta name="copyright" content="Skykens"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本篇主要参照 [深入select多路复用内核源码加驱动实现][1] 和 [Linux内核select源码剖析][2]  select下面这些是用户态下可调用的API函数 # include &lt;sys&#x2F;select.h&gt; int select(int nfds, fd_set *readfds, fd_set *writefds,             fd_set *except">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解select 模型     （源码分析 ）">
+<meta property="og:url" content="https://skykens.github.io/shen-ru-li-jie-select-mo-xing-yuan-ma-fen-xi/index.html">
+<meta property="og:site_name" content="现役程序员skykens的博客">
+<meta property="og:description" content="本篇主要参照 [深入select多路复用内核源码加驱动实现][1] 和 [Linux内核select源码剖析][2]  select下面这些是用户态下可调用的API函数 # include &lt;sys&#x2F;select.h&gt; int select(int nfds, fd_set *readfds, fd_set *writefds,             fd_set *except">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-4g6l30.jpg">
+<meta property="article:published_time" content="2020-02-01T20:46:00.000Z">
+<meta property="article:modified_time" content="2020-03-10T14:28:07.000Z">
+<meta property="article:author" content="Skykens">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-4g6l30.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://skykens.github.io/shen-ru-li-jie-select-mo-xing-yuan-ma-fen-xi/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Skykens","link":"Link: ","source":"Source: 现役程序员skykens的博客","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"Traditional Chinese Activated Manually","cht_to_chs":"Simplified Chinese Activated Manually","day_to_night":"Dark Mode Activated Manually","night_to_day":"Light Mode Activated Manually","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '深入理解select 模型     （源码分析 ）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-03-10 14:28:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="现役程序员skykens的博客" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">99</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">17</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目錄</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-4g6l30.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">现役程序员skykens的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目錄</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友鏈</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">深入理解select 模型     （源码分析 ）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2020-02-01T20:46:00.000Z" title="Created 2020-02-01 20:46:00">2020-02-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-03-10T14:28:07.000Z" title="Updated 2020-03-10 14:28:07">2020-03-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="深入理解select 模型     （源码分析 ）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p> 本篇主要参照 [深入select多路复用内核源码加驱动实现][1] 和 [Linux内核select源码剖析][2]</p>
+</blockquote>
+<h1 id="select"><a href="#select" class="headerlink" title="select"></a>select</h1><p>下面这些是用户态下可调用的API函数</p>
+<pre class="line-numbers language-none"><code class="language-none"># include &lt;sys/select.h&gt;
+int select(int nfds, fd_set *readfds, fd_set *writefds, 
+           fd_set *exceptfds, struct timeval *timeout);
+void FD_CLR(int fd, fd_set *set);
+int  FD_ISSET(int fd, fd_set *set);
+void FD_SET(int fd, fd_set *set);
+void FD_ZERO(fd_set *set);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中以大写的FD_为前缀的函数并非系统调用，而是几个对fd_set进行相关位操作的宏，对应原型定义如下<strong>（/usr/include/sys/select.h和/usr/include/bits/select.h）</strong>：</p>
+<pre class="line-numbers language-none"><code class="language-none">typedef long int __fd_mask;
+ 
+# define __NFDBITS       (8 * (int) sizeof (__fd_mask))
+# define __FD_ELT(d)     ((d) / __NFDBITS)
+# define __FD_MASK(d)    ((__fd_mask) 1 &lt;&lt; ((d) % __NFDBITS))
+ 
+/* fd_set for select and pselect.  */
+ typedef struct
+   {
+     /* XPG4.2 requires this member name.  Otherwise avoid the name
+        from the global namespace.  */
+ # ifdef __USE_XOPEN
+     __fd_mask fds_bits[__FD_SETSIZE / __NFDBITS];
+ # define __FDS_BITS(set) ((set)-&gt;fds_bits)
+ # else
+     __fd_mask __fds_bits[__FD_SETSIZE / __NFDBITS];
+ # define __FDS_BITS(set) ((set)-&gt;__fds_bits)
+ # endif
+   } fd_set;
+ 
+/* Maximum number of file descriptors in `fd_set'.  */
+# define FD_SETSIZE              __FD_SETSIZE  //这是指定 最大数量的文件描述符
+ 
+// sys/select.h
+# define FD_SET(fd, fdsetp)      __FD_SET (fd, fdsetp)
+# define FD_CLR(fd, fdsetp)      __FD_CLR (fd, fdsetp)
+# define FD_ISSET(fd, fdsetp)    __FD_ISSET (fd, fdsetp)
+# define FD_ZERO(fdsetp)         __FD_ZERO (fdsetp)
+ 
+// bits/select.h
+# define __FD_ZERO(fdsp) \
+  do {                                                                        \
+    int __d0, __d1;                                                           \
+    __asm__ __volatile__ ("cld; rep; " __FD_ZERO_STOS                         \
+                          : "=c" (__d0), "=D" (__d1)                          \
+                          : "a" (0), "0" (sizeof (fd_set)                     \
+                                          / sizeof (__fd_mask)),              \
+                            "1" (&amp;__FDS_BITS (fdsp)[0])                       \
+                          : "memory");                                        \
+  } while (0)
+ 
+//实际调用的宏
+# define __FD_SET(d, set) \  
+   ((void) (__FDS_BITS (set)[__FD_ELT (d)] |= __FD_MASK (d)))
+# define __FD_CLR(d, set) \
+   ((void) (__FDS_BITS (set)[__FD_ELT (d)] &amp;= ~__FD_MASK (d)))
+# define __FD_ISSET(d, set) \
+   ((__FDS_BITS (set)[__FD_ELT (d)] &amp; __FD_MASK (d)) != 0)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>上面可以看到fd_set结构体的定义实际包含的是fds_bits位数组，其大小固定，由FD_SETSIZE指定（/usr/include/bits/typesizes.h中），在当前内核中数值为1024，可见每次select系统调用可监听处理的文件描述符最大数量为1024。<br>其中宏定义体中如__FD_SET对应的（void），作用为消除编译器对类型不一致相关的警告，并无其它附加意义。</p>
+<p>言归正传，找到用户态下select系统调用入口为为：</p>
+<p>SYSCALL_DEFINE5(select, int, n, fd_set __user *, inp, fd_set __user *, outp,<br>        fd_set __user *, exp, struct timeval __user *, tvp)<br>{<br>    struct timespec end_time, *to = NULL;<br>    struct timeval tv;<br>    int ret;</p>
+<pre><code>if (tvp) {
+    if (copy_from_user(&amp;tv, tvp, sizeof(tv)))
+        return -EFAULT;
+
+    to = &amp;end_time;
+    if (poll_select_set_timeout(to,
+            tv.tv_sec + (tv.tv_usec / USEC_PER_SEC),
+            (tv.tv_usec % USEC_PER_SEC) * NSEC_PER_USEC))
+        return -EINVAL;
+}
+
+ret = core_sys_select(n, inp, outp, exp, to);
+ret = poll_select_copy_remaining(&amp;end_time, tvp, 1, ret);
+
+return ret;
+</code></pre>
+<p>}</p>
+<h2 id="sys-select"><a href="#sys-select" class="headerlink" title="sys_select"></a>sys_select</h2><p>言归正传，找到用户态下select系统调用入口为为：</p>
+<p>这里主要做的事情：</p>
+<ol>
+<li>将用户设置的超时时间从用户态拷贝到内核态</li>
+<li>对时间进行转换</li>
+<li>调用core_sys_select</li>
+<li>将剩余时间拷贝到用户进程时间<pre class="line-numbers language-none"><code class="language-none"># undef __NFDBITS
+# define __NFDBITS    (8 * sizeof(unsigned long))
+
+# undef __FD_SETSIZE
+# define __FD_SETSIZE    1024
+
+# undef __FDSET_LONGS
+# define __FDSET_LONGS    (__FD_SETSIZE/__NFDBITS)
+
+ 
+typedef struct {
+    unsigned longfds_bits [__FDSET_LONGS];   //1024个bit。可以看到可以支持1024个描述符
+} __kernel_fd_set;
+
+//系统调用（内核态）
+//参数为 maxfd, r_fds, w_fds, e_fds, timeout。
+asmlinkage long sys_select(int n, fd_set __user *inp, fd_set __user *outp, fd_set __user *exp, struct timeval __user *tvp)
+{
+    s64 timeout = -1;
+    struct timeval tv;
+    int ret;
+
+    //将超时时间换成jiffies
+    if (tvp) {
+        if (copy_from_user(&amp;tv, tvp, sizeof(tv))) //将用户态参数拷贝到内核态
+            return -EFAULT;
+         if (tv.tv_sec &lt; 0 || tv.tv_usec &lt; 0)
+            return -EINVAL;
+         /* Cast to u64 to make GCC stop complaining */
+        if ((u64)tv.tv_sec &gt;= (u64)MAX_INT64_SECONDS)
+            timeout = -1;    /* infinite */
+        else {
+            timeout = ROUND_UP(tv.tv_usec, USEC_PER_SEC/HZ);
+            timeout += tv.tv_sec * HZ;
+        }
+    }
+    // (***) 调用 core_sys_select
+    ret = core_sys_select(n, inp, outp, exp, &amp;timeout);
+
+    //将剩余时间拷贝回用户空间进程
+    if (tvp) {
+        struct timeval rtv;
+        if (current-&gt;personality &amp; STICKY_TIMEOUTS) //判断当前环境是否支持修改超时时间（不确定）
+            goto sticky;
+        rtv.tv_usec = jiffies_to_usecs(do_div((*(u64*)&amp;timeout), HZ));
+        rtv.tv_sec = timeout;
+        if (timeval_compare(&amp;rtv, &amp;tv) &gt;= 0)
+            rtv = tv;
+        if (copy_to_user(tvp, &amp;rtv, sizeof(rtv))) {
+sticky:
+            /*
+             * 如果应用程序将timeval值放在只读存储中，
+             * 我们不希望在成功完成select后引发错误（修改timeval）
+             * 但是，因为没修改timeval，所以我们不能重启这个系统调用。
+             */
+            if (ret == -ERESTARTNOHAND)
+                ret = -EINTR;
+        }
+    }
+    return ret;
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<h2 id="core-sys-select"><a href="#core-sys-select" class="headerlink" title="core_sys_select"></a>core_sys_select</h2><p>上面的都是时间方面的准备工作 , 对于需要监听的集合的操作是通过core_sys_select 来进行的</p>
+<pre class="line-numbers language-none"><code class="language-none">
+//主要的工作在这个函数中完成
+staticint core_sys_select(int n, fd_set __user *inp, fd_set __user *outp, fd_set __user *exp, s64 *timeout)
+{
+    fd_set_bits fds;
+    /*  fd_set_bits 结构如下：
+     typedef struct {
+         unsigned long *in, *out, *ex;
+         unsigned long *res_in, *res_out, *res_ex;
+    } fd_set_bits;
+
+    这个结构体中定义的全是指针，这些指针都是用来指向描述符集合的。
+
+     */
+
+    void *bits;
+    int ret, max_fds;
+    unsigned int size;
+    struct fdtable *fdt;
+    /* Allocate small arguments on the stack to save memory and be faster 先尝试使用栈（因为栈省内存且快速）*/
+
+    long stack_fds[SELECT_STACK_ALLOC/sizeof(long)];  // SELECT_STACK_ALLOC=256
+    //执行后stack_fds= 32  (sizeof(long)=8)
+    ret = -EINVAL;
+    if (n &lt; 0)   //传入的描述符无效 
+        goto out_nofds;
+
+    /* max_fds can increase, so grab it once to avoid race */
+     //最大描述符是会改变的,加锁避免竞争
+    rcu_read_lock(); //rcu锁
+
+    fdt = files_fdtable(current-&gt;files); //读取文件描述符表
+    /*  struct fdtable 结构如下：
+    struct fdtable {
+       unsigned int max_fds;
+       struct file **fd;
+       ...
+    };
+     */
+
+    max_fds = fdt-&gt;max_fds; //从files结构中获取最大值（当前进程能够处理的最大文件数目）
+    rcu_read_unlock();
+    if (n &gt; max_fds)
+// 如果传入的n大于当前进程最大的文件描述符，给予修正
+        n = max_fds;
+
+    /* 我们需要使用6倍于最大描述符的描述符个数,
+     * 分别是in/out/exception（参见fd_set_bits结构体）,
+     * 并且每份有一个输入和一个输出(用于结果返回) */
+    size = FDS_BYTES(n);// 以一个文件描述符占一bit来计算，传递进来的这些fd_set需要用掉多少个字
+    bits = stack_fds;
+    if (size &gt; sizeof(stack_fds) / 6) { // 除以6，因为每个文件描述符需要6个bitmaps上的位。
+        //栈不能满足，先前的尝试失败，只能使用kmalloc方式
+        /* Not enough space in on-stack array; must use kmalloc */
+        ret = -ENOMEM;
+        bits = kmalloc(6 * size, GFP_KERNEL);
+        if (!bits)
+            goto out_nofds;
+    }
+    //设置fds
+    fds.in      = bits;
+    fds.out     = bits +   size;
+    fds.ex      = bits + 2*size;
+    fds.res_in  = bits + 3*size;
+    fds.res_out = bits + 4*size;
+    fds.res_ex  = bits + 5*size;
+
+    // get_fd_set仅仅调用copy_from_user从用户空间拷贝了fd_se
+    if ((ret = get_fd_set(n, inp, fds.in)) ||
+        (ret = get_fd_set(n, outp, fds.out)) ||
+        (ret = get_fd_set(n, exp, fds.ex)))
+        goto out;
+
+    // 对这些存放返回状态的字段清0
+    zero_fd_set(n, fds.res_in);
+    zero_fd_set(n, fds.res_out);
+    zero_fd_set(n, fds.res_ex);
+
+    // 执行do_select，完成监控功能
+    ret = do_select(n, &amp;fds, timeout);
+    if (ret &lt; 0) // 有错误
+        goto out;
+    if (!ret) {  // 超时返回，无设备就绪
+        ret = -ERESTARTNOHAND;
+        if (signal_pending(current))
+            goto out;
+        ret = 0;
+    }
+
+    if (set_fd_set(n, inp, fds.res_in) ||
+        set_fd_set(n, outp, fds.res_out) ||
+        set_fd_set(n, exp, fds.res_ex))
+        ret = -EFAULT;
+
+out:
+    if (bits != stack_fds)
+        kfree(bits);
+
+out_nofds:
+    return ret;
+}
+
+
+
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>![core_select.png][3]</p>
+<h2 id="do-select"><a href="#do-select" class="headerlink" title="do_select"></a>do_select</h2><p>到目前为止,之前所有的准备工作都已经做完了,现在我们需要到真正运行的do_select 中一探究竟.但是在此之前，我们需要知道源码中比较重要的四个结构体：</p>
+<pre class="line-numbers language-none"><code class="language-none">
+struct poll_wqueues
+
+struct poll_table_page
+
+struct poll_table_entry
+
+struct poll_table_struct。
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>每一个调用select()系统调用的应用进程都会存在一个struct poll_wqueues结构体，用来统一辅佐实现这个进程中所有待监测的fd的轮询工作，后面所有的工作和都这个结构体有关，所以它非常重要。</p>
+<pre class="line-numbers language-none"><code class="language-none">struct poll_wqueues {
+       poll_table pt;
+       struct poll_table_page *table;
+       struct task_struct *polling_task; //保存当前调用select的用户进程struct task_struct结构体
+       int triggered;            // 当前用户进程被唤醒后置成1，以免该进程接着进睡眠
+       int error;                 // 错误码
+       int inline_index;        // 数组inline_entries的引用下标
+       struct poll_table_entry inline_entries[N_INLINE_POLL_ENTRIES];
+};
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>实际上结构体<strong>poll_wqueues</strong>内嵌的<strong>poll_table_entry</strong>数组<strong>inline_entries[]</strong> 的大小是有限的，如果空间不够用，后续会动态申请物理内存页以链表的形式挂载<strong>poll_wqueues.table</strong>上统一管理。接下来的两个结构体就和这项内容密切相关：</p>
+<pre class="line-numbers language-none"><code class="language-none">struct poll_table_page { // 申请的物理页都会将起始地址强制转换成该结构体指针
+       struct poll_table_page   *next;      // 指向下一个申请的物理页
+       struct poll_table_entry  *entry;     // 指向entries[]中首个待分配(空的) poll_table_entry地址
+       struct poll_table_entry  entries[0]; // 该page页后面剩余的空间都是待分配的poll_table_entry结构体
+};
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>对每一个fd调用<strong>fop-&gt;poll() =&gt; poll_wait() =&gt; __pollwait()<strong>都会先从</strong>poll_wqueues.inline_entries[]<strong>中分配一个</strong>poll_table_entry</strong>结构体，直到该数组用完才会分配物理页挂在链表指针<strong>poll_wqueues.table</strong>上然后才会分配一个<strong>poll_table_entry</strong>结构体（poll_get_entry函数）。</p>
+<p>poll_table_entry具体用处：函数__pollwait声明如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">static void __pollwait(struct file *filp, wait_queue_head_t *wait_address, poll_table *p);<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+<p>该函数调用时需要3个参数，第一个是特定fd对应的file结构体指针，第二个就是特定fd对应的硬件驱动程序中的等待队列头指针，第3个是调用select()的应用进程中poll_wqueues结构体的poll_table项（该进程监测的所有fd调用fop-&gt;poll函数都用这一个poll_table结构体）。</p>
+<pre class="line-numbers language-none"><code class="language-none">struct poll_table_entry {
+       struct file     *filp;                 // 指向特定fd对应的file结构体;
+       unsigned long   key;                   // 等待特定fd对应硬件设备的事件掩码，如POLLIN、 POLLOUT、POLLERR;
+       wait_queue_t    wait;                  // 代表调用select()的应用进程，等待在fd对应设备的特定事件 (读或者写)的等待队列头上的等待队列项;
+       wait_queue_head_t   *wait_address;     // 设备驱动程序中特定事件的等待队列头(该fd执行fop-&gt;poll，需要等待时在哪等，所以叫等待地址)；
+};<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+
+<pre class="line-numbers language-none"><code class="language-none"># define POLLIN_SET (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+# define POLLOUT_SET (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+# define POLLEX_SET (POLLPRI)
+
+int do_select(int n, fd_set_bits *fds, s64 *timeout)
+{
+    struct poll_wqueues table;
+
+    /*
+     struct poll_wqueues {
+          poll_table pt;
+          struct poll_table_page *table;
+          struct task_struct *polling_task; //保存当前调用select的用户进程struct task_struct结构体
+          int triggered;         // 当前用户进程被唤醒后置成1，以免该进程接着进睡眠
+          int error;             // 错误码
+          int inline_index;      // 数组inline_entries的引用下标
+          struct poll_table_entry inline_entries[N_INLINE_POLL_ENTRIES];
+    };
+
+     */
+
+    poll_table *wait;
+    int retval, i;
+    rcu_read_lock();
+    //根据已经设置好的fd位图检查用户打开的fd, 要求对应fd必须打开, 并且返回最大的fd。
+    retval = max_select_fd(n, fds);
+    rcu_read_unlock();
+    if (retval &lt; 0)
+        return retval;
+
+    n = retval;
+    /* 一些重要的初始化：
+       poll_wqueues.poll_table.qproc函数指针初始化，
+       该函数是驱动程序中poll函数（fop-&gt;poll）实现中必须要调用的poll_wait()中使用的函数。  */
+    poll_initwait(&amp;table);
+/*
+
+void poll_initwait(struct poll_wqueues *pwq)
+{
+    // 设置回调函数 __pollwait
+    init_poll_funcptr(&amp;pwq-&gt;pt, __pollwait);
+    pwq-&gt;error = 0;
+    pwq-&gt;table = NULL;
+    pwq-&gt;inline_index = 0;
+}
+
+static inline void init_poll_funcptr(poll_table *pt, poll_queue_proc qproc)
+{
+    pt-&gt;qproc = qproc;
+}
+这个函数实现很关键，这里 init_poll_funcptr 初始化回调函数为 __pollwait, 后面轮询会回调这个函数，然后通过这个函数把进程添加到对应的监听文件等待队列，当有事件到来时，就会唤醒这个进程。
+
+*/
+
+    wait = &amp;table.pt;   //这里把 wait 设置为这个回调函数的指针
+
+
+    if (!*timeout)//当 timeout=0 的时候把wait设置为 0，这个可以实现非阻塞的功能
+        wait = NULL;       
+    retval = 0;
+
+    for (;;) {
+        unsigned long *rinp, *routp, *rexp, *inp, *outp, *exp;
+        long __timeout;
+        set_current_state(TASK_INTERRUPTIBLE);
+        inp = fds-&gt;in; outp = fds-&gt;out; exp = fds-&gt;ex;
+        rinp = fds-&gt;res_in; routp = fds-&gt;res_out; rexp = fds-&gt;res_ex;
+        // 所有n个fd的循环
+        for (i = 0; i &lt; n; ++rinp, ++routp, ++rexp) {
+            unsigned long in, out, ex, all_bits, bit = 1, mask, j;
+            unsigned long res_in = 0, res_out = 0, res_ex = 0;
+            const struct file_operations *f_op = NULL;
+            struct file *file = NULL;
+             // 先取出当前循环周期中的32（设long占32位）个文件描述符对应的bitmaps
+            in = *inp++; out = *outp++; ex = *exp++;
+            all_bits = in | out | ex;// 组合一下，有的fd可能只监测读，或者写，或者err，或者同时都监测
+            if (all_bits == 0) {
+                i += __NFDBITS; //如果这个字没有待查找的描述符, 跳过这个长字(32位，__NFDBITS=32)，取下一个32个fd的循环中
+                continue;
+
+            }
+            // 本次32个fd的循环中有需要监测的状态存在
+            for (j = 0; j &lt; __NFDBITS; ++j, ++i, bit &lt;&lt;= 1) {
+                int fput_needed;
+                if (i &gt;= n)
+                   break;
+                if (!(bit &amp; all_bits)) // bit每次循环后左移一位的作用在这里，用来跳过没有状态监测的fd
+                   continue;
+
+                file = fget_light(i, &amp;fput_needed);//得到file结构指针，并增加引用计数字段f_count
+                if (file) {// 如果file存在（这个文件描述符对应的文件确实打开了）
+                    f_op = file-&gt;f_op;
+                    mask = DEFAULT_POLLMASK;
+                // 这里会调用 struct file*实现的poll函数进行轮询
+                    if (f_op &amp;&amp; f_op-&gt;poll) //这个文件对应的驱动程序提供了poll函数（fop-&gt;poll）。
+                        mask = (*f_op-&gt;poll)(file, retval ? NULL : wait);//调用驱动程序中的poll函数。
+                    /*  调用驱动程序中的poll函数，以evdev驱动中的evdev_poll()为例
+                     *  该函数会调用函数poll_wait(file, &amp;evdev-&gt;wait, wait)，
+                     *  继续调用__pollwait()回调来分配一个poll_table_entry结构体，
+                     *  该结构体有一个内嵌的等待队列项，
+                     *  设置好wake时调用的回调函数后将其添加到驱动程序中的等待队列头中。  */
+
+                    fput_light(file, fput_needed);  // 释放file结构指针，实际就是减小他的一个引用计数字段f_count。
+                    //记录结果。poll函数返回的mask是设备的状态掩码。
+                    if ((mask &amp; POLLIN_SET) &amp;&amp; (in &amp; bit)) {
+                        res_in |= bit; //如果是这个描述符可读, 将这个位置位
+                        retval++;   //返回描述符个数加1
+                    }
+
+                    if ((mask &amp; POLLOUT_SET) &amp;&amp; (out &amp; bit)) {
+                        res_out |= bit;
+                        retval++;
+                    }
+
+                    if ((mask &amp; POLLEX_SET) &amp;&amp; (ex &amp; bit)) {
+                        res_ex |= bit;
+                        retval++;
+                    }
+                }
+                /*
+                 *  cond_resched()将判断是否有进程需要抢占当前进程，
+                 *  如果是将立即发生调度，这只是为了增加强占点。
+                 *  （给其他紧急进程一个机会去执行，增加了实时性）
+                 *  在支持抢占式调度的内核中（定义了CONFIG_PREEMPT），
+                 *  cond_resched是空操作。
+                 */
+                cond_resched();
+            }
+
+            //返回结果
+            if (res_in)
+                *rinp = res_in;
+            if (res_out)
+                *routp = res_out;
+            if (res_ex)
+               *rexp = res_ex;
+        }
+        wait = NULL;
+        if (retval || !*timeout || signal_pending(current)) // signal_pending(current)检查当前进程是否有信号要处理
+            break;
+        if(table.error) {
+            retval = table.error;
+            break;
+        }
+ 
+        if (*timeout &lt; 0) {
+            /* Wait indefinitely 无限期等待*/
+            __timeout = MAX_SCHEDULE_TIMEOUT;
+        } elseif (unlikely(*timeout &gt;= (s64)MAX_SCHEDULE_TIMEOUT - 1)) {
+            /* Wait for longer than MAX_SCHEDULE_TIMEOUT. Do it in a loop */
+            __timeout = MAX_SCHEDULE_TIMEOUT - 1;
+            *timeout -= __timeout;
+        } else {
+            __timeout = *timeout;
+            *timeout = 0;
+       }
+
+         /* schedule_timeout 用来让出CPU；
+          * 在指定的时间用完以后或者其它事件到达并唤醒进程（比如接收了一个信号量）时，
+          * 该进程才可以继续运行  */
+        __timeout = schedule_timeout(__timeout);
+        if (*timeout &gt;= 0)
+            *timeout += __timeout;
+    }
+    __set_current_state(TASK_RUNNING);
+
+    poll_freewait(&amp;table);
+    return retval;
+}
+
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>![do_select.png][4]</p>
+<blockquote>
+<p>引用自论[select的实现][5]</p>
+</blockquote>
+<p>上面的实现看起来一上来就是轮询，假设所有的文件描述符都没有数据可以读写，会怎么样呢? 理论上应该需要监听所有的文件描述符，当有其中一个有数据到来时就唤醒进程。那么哪个地方把进程添加到文件描述符对应的监听列表呢?</p>
+<p>对于 tcp 的文件描述符, 他的 poll 函数实现（跟我们上面的poll不是一个东西），调用了sock_poll, 里面又调用了 tcp_poll, tcp_poll 里面会执行下面步骤:</p>
+<p>调用 poll_wait<br>查询当前文件描述符的状态，是否可读写。</p>
+<pre class="line-numbers language-none"><code class="language-none">unsigned int tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
+{
+    ...
+    poll_wait(file, sk-&gt;sk_sleep, wait);
+    ...
+}
+
+static inline void poll_wait(struct file * filp, wait_queue_head_t * wait_address, poll_table *p)
+{
+    if (p &amp;&amp; wait_address)
+        p-&gt;qproc(filp, wait_address, p);
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>回到上面的问题，就是通过 poll_wait 函数把当前进程挂到 sk-&gt;sk_sleep 这个队列里面来，当有读写事件到来时，就会唤醒这个队列里面的进程，让他们重新运行，来轮询读写数据。</p>
+<p>而这个 qproc 函数就是上面 poll_initwait 函数初始化的回调函数 __pollwait。</p>
+<pre class="line-numbers language-none"><code class="language-none">static void __pollwait(struct file *filp, wait_queue_head_t *wait_address,
+                poll_table *p)
+{
+    struct poll_table_entry *entry = poll_get_entry(p);
+    if (!entry)
+        return;
+    get_file(filp);
+    entry-&gt;filp = filp;
+    entry-&gt;wait_address = wait_address;
+    init_waitqueue_entry(&amp;entry-&gt;wait, current);
+
+    // 新添加的进程添加到设备事件触发等待队列
+    add_wait_queue(wait_address, &amp;entry-&gt;wait);
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个函数实现就是把当前进程挂到 sk-&gt;sleep 队列。 上面还可以看到调用回调函数的条件必须是 wait_address 和 p 不为空，也就是说如果不想把文件描述挂到监听列表，只需要把 p 这个参数设置为 NULL.</p>
+<p>因为进程挂到某一个文件的监听列表，只要挂一次即可。所以第一次循环之后把所有的文件描述符挂一遍之后就会把这个参数设置为 NULL。</p>
+<p>还有两种情况也会把这个参数设置为 NULL:</p>
+<p>1、 已经有文件描述符有读写事件，不需要再挂，因为一遍轮询就会退出，取消所有监听。</p>
+<pre class="line-numbers language-none"><code class="language-none">if (f_op &amp;&amp; f_op-&gt;poll)
+    mask = (*f_op-&gt;poll)(file, retval ? NULL : wait);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>2、 最上面提到的, timeout = 0, 会把 wait 参数为 NULL, 即不会有挂载行为，轮询一遍立即返回，不等待事件到来，类似 non-blocking 的效果。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过上面的叙述，我们能看到每一次轮询调用select都需要将 集合 从用户态拷贝到内核态中，当有时间发生的时候又需要再拷贝回来.当监听的数量多的时候这样效率极低，同时也需要重新将进程挂载到监听的文件描述符中.</p>
+<p>同时返回回来的时候并不知道有哪些事件有响应需要再重新轮询一遍.再次降低了效率.</p>
+<h2 id="EPOLL-的改进"><a href="#EPOLL-的改进" class="headerlink" title="EPOLL 的改进"></a>EPOLL 的改进</h2><p>进程挂载到监听的文件描述符只会挂一次。<br>用专门的链表来存储有事件到来的文件描述符，返回给用户进程，只需要拷贝这个链表。<br>使用红黑树来管理文件描述符，可以做到快速添加监听的文件描述符。</p>
+<h1 id="惊群效应"><a href="#惊群效应" class="headerlink" title="惊群效应"></a>惊群效应</h1><p>简言之，惊群现象就是多进程（多线程）在同时阻塞等待同一个事件的时候（休眠状态），如果等待的这个事件发生，那么他就会唤醒等待的所有进程（或者线程），但是最终却只可能有一个进程（线程）获得这个时间的“控制权”，对该事件进行处理，而其他进程（线程）获取“控制权”失败，只能重新进入休眠状态，这种现象和性能浪费就叫做惊群。</p>
+<p>这是因为这些进程都处在同一个监听等待队列中,当有事件响应的时候，内核会通知这个队列并唤醒队列中的所有进程。</p>
+<h2 id="惊群效应到底消耗了什么？"><a href="#惊群效应到底消耗了什么？" class="headerlink" title="惊群效应到底消耗了什么？"></a>惊群效应到底消耗了什么？</h2><ol>
+<li>系统对用户进程/线程频繁地做无效的调度，上下文切换系统性能大打折扣。</li>
+<li>为了确保只有一个进程得到资源，用户必须对资源操作进行加锁保护，进一步加大了系统开销。<br>&nbsp; &nbsp;&nbsp;&nbsp;是不是还是觉得不够深入，概念化？看下面：</li>
+</ol>
+<p>1、上下文切换（context&nbsp; switch）过高会导致cpu像个搬运工，频繁地在寄存器和运行队列之间奔波，更多的时间花在了进程（线程）切换，而不是在真正工作的进程（线程）上面。直接的消耗包括cpu寄存器要保存和加载（例如程序计数器）、系统调度器的代码需要执行。间接的消耗在于多核cache之间的共享数据。</p>
+<p>看一下：wiki上下文切换</p>
+<p>2、通过锁机制解决惊群效应是一种方法，在任意时刻只让一个进程（线程）处理等待的事件。但是锁机制也会造成cpu等资源的消耗和性能损耗。目前一些常见的服务器软件有的是通过锁机制解决的，比如nginx（它的锁机制是默认开启的，可以关闭）；还有些认为惊群对系统性能影响不大，没有去处理，比如lighttpd。</p>
+<p>  [1]: <a target="_blank" rel="noopener" href="https://my.oschina.net/fileoptions/blog/911091?tdsourcetag=s_pctim_aiomsg#">https://my.oschina.net/fileoptions/blog/911091?tdsourcetag=s_pctim_aiomsg#</a> h1_1<br>  [2]: <a target="_blank" rel="noopener" href="http://www.pandademo.com/2016/11/linux-kernel-select-source-dissect/?tdsourcetag=s_pctim_aiomsg">http://www.pandademo.com/2016/11/linux-kernel-select-source-dissect/?tdsourcetag=s_pctim_aiomsg</a><br>  [3]: <a target="_blank" rel="noopener" href="https://banthink.com/usr/uploads/2020/02/2227498139.png">https://banthink.com/usr/uploads/2020/02/2227498139.png</a><br>  [4]: <a target="_blank" rel="noopener" href="https://banthink.com/usr/uploads/2020/02/1227669105.png">https://banthink.com/usr/uploads/2020/02/1227669105.png</a><br>  [5]: <a target="_blank" rel="noopener" href="http://www.hulkdev.com/posts/select-io">http://www.hulkdev.com/posts/select-io</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:bohemia0508@gmail.com">Skykens</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://skykens.github.io/shen-ru-li-jie-select-mo-xing-yuan-ma-fen-xi/">https://skykens.github.io/shen-ru-li-jie-select-mo-xing-yuan-ma-fen-xi/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-4g6l30.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/linuxepoll-mo-xing-xiang-jie-ji-yuan-ma-fen-xi-zhuan/"><img class="prev-cover" src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-ox2dg7.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">Linux epoll模型详解及源码分析 ( 转)</div></div></a></div><div class="next-post pull-right"><a href="/linux-io-mo-xing/"><img class="next-cover" src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-z8mq8y.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Linux  I/O模型</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/head.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Skykens</div><div class="author-info__description"> 分享后端开发相关知识、复盘、个人观点，愿君喜欢。</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">99</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">17</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/skykens"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/skykens" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="skykens:470798745@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">2020年,关键词:疫情,求职,进入腾讯
+2021年,关键词:入职,异地,迷茫
+2022年,学习,改变,写作自由,离开
+2023年,关键词:新城市,思念,深耕,代码自由</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#select"><span class="toc-number">1.</span> <span class="toc-text">select</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#sys-select"><span class="toc-number">1.1.</span> <span class="toc-text">sys_select</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#core-sys-select"><span class="toc-number">1.2.</span> <span class="toc-text">core_sys_select</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#do-select"><span class="toc-number">1.3.</span> <span class="toc-text">do_select</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EPOLL-%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="toc-number">1.5.</span> <span class="toc-text">EPOLL 的改进</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94"><span class="toc-number">2.</span> <span class="toc-text">惊群效应</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94%E5%88%B0%E5%BA%95%E6%B6%88%E8%80%97%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">2.1.</span> <span class="toc-text">惊群效应到底消耗了什么？</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/undefined-symbol-ke-neng-de-wen-ti/" title="undefined symbol 可能的问题"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-zxg76o.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="undefined symbol 可能的问题"/></a><div class="content"><a class="title" href="/undefined-symbol-ke-neng-de-wen-ti/" title="undefined symbol 可能的问题">undefined symbol 可能的问题</a><time datetime="2023-03-23T22:01:00.000Z" title="Created 2023-03-23 22:01:00">2023-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/" title="开箱即用的开发环境"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-6oqzgq.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="开箱即用的开发环境"/></a><div class="content"><a class="title" href="/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/" title="开箱即用的开发环境">开箱即用的开发环境</a><time datetime="2023-03-23T00:16:00.000Z" title="Created 2023-03-23 00:16:00">2023-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/" title="漫谈VCS在游戏中的使用"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-6oqzgq.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="漫谈VCS在游戏中的使用"/></a><div class="content"><a class="title" href="/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/" title="漫谈VCS在游戏中的使用">漫谈VCS在游戏中的使用</a><time datetime="2023-03-18T00:01:00.000Z" title="Created 2023-03-18 00:01:00">2023-03-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/" title="关于通过cp覆盖so导致coredump"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-dgpvzl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="关于通过cp覆盖so导致coredump"/></a><div class="content"><a class="title" href="/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/" title="关于通过cp覆盖so导致coredump">关于通过cp覆盖so导致coredump</a><time datetime="2021-07-08T10:20:27.000Z" title="Created 2021-07-08 10:20:27">2021-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/" title="Kubernetes学习笔记0-从零搭建k8s集群"><img src="https://raw.githubusercontent.com/skykens/pubPhotos/main/wallhaven-5dx6w7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes学习笔记0-从零搭建k8s集群"/></a><div class="content"><a class="title" href="/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/" title="Kubernetes学习笔记0-从零搭建k8s集群">Kubernetes学习笔记0-从零搭建k8s集群</a><time datetime="2021-06-30T15:20:27.000Z" title="Created 2021-06-30 15:20:27">2021-06-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2023 By Skykens</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://butterfly.js.org/">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'AmW91X1WNrKyj5Y7sCfuj4v3-gzGzoHsz',
+      appKey: '4SoS7HRckX0IlgpKVJcVSpsP',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

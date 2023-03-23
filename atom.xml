@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>现役程序员skykens的博客</title>
+  <icon>https://www.gravatar.com/avatar/aec2a37719732bba026dca4502d52230</icon>
+  <subtitle>练习时长两年半的后端开发实习生</subtitle>
+  <link href="https://skykens.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://skykens.github.io/"/>
+  <updated>2023-03-23T22:12:00.000Z</updated>
+  <id>https://skykens.github.io/</id>
+  
+  <author>
+    <name>Skykens</name>
+    <email>bohemia0508@gmail.com</email>
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>undefined symbol 可能的问题</title>
+    <link href="https://skykens.github.io/undefined-symbol-ke-neng-de-wen-ti/"/>
+    <id>https://skykens.github.io/undefined-symbol-ke-neng-de-wen-ti/</id>
+    <published>2023-03-23T22:01:00.000Z</published>
+    <updated>2023-03-23T22:12:00.000Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;备忘录&quot;&gt;&lt;a href=&quot;#备忘录&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="链接" scheme="https://skykens.github.io/categories/%E9%93%BE%E6%8E%A5/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>开箱即用的开发环境</title>
+    <link href="https://skykens.github.io/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/"/>
+    <id>https://skykens.github.io/na-xie-kai-xiang-ji-yong-de-kai-fa-huan-jing/</id>
+    <published>2023-03-23T00:16:00.000Z</published>
+    <updated>2023-03-18T00:12:00.000Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;每次安装部署开发环境都很折腾。不是这个依赖就是那个依赖，然后基开发资源如果有限的话就更头疼，有没有可能有开箱即用的开发环境呢。可以让新人一来项目，部署环境就像安装个exe文件那么简单。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1</summary>
+        
+      
+    
+    
+    
+    <category term="日志" scheme="https://skykens.github.io/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>漫谈VCS在游戏中的使用</title>
+    <link href="https://skykens.github.io/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/"/>
+    <id>https://skykens.github.io/man-tan-vcs-zai-you-xi-zhong-de-shi-yong/</id>
+    <published>2023-03-18T00:01:00.000Z</published>
+    <updated>2023-03-18T00:12:00.000Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;漫谈VCS在游戏中的使用&quot;&gt;&lt;a href=&quot;#漫谈VCS在游戏中的使用&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="VCS" scheme="https://skykens.github.io/categories/VCS/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>关于通过cp覆盖so导致coredump</title>
+    <link href="https://skykens.github.io/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/"/>
+    <id>https://skykens.github.io/guan-yu-tong-guo-cp-fu-gai-so-dao-zhi-coredump/</id>
+    <published>2021-07-08T10:20:27.000Z</published>
+    <updated>2023-03-23T15:31:40.703Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;| 这个问题的起因是在讨论别人热更方案的过程中发现用cp替换so会出现coredump的问题，这里转载一部分网上的文章同时自己做一个补充。后续补充服务器热更的一些文章吧（如果有时间的话：）&lt;/p&gt;
+&lt;h3</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="https://skykens.github.io/categories/Linux/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Kubernetes学习笔记0-从零搭建k8s集群</title>
+    <link href="https://skykens.github.io/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/"/>
+    <id>https://skykens.github.io/kubernetes-xue-xi-bi-ji-0-cong-ling-da-jian-k8s-ji-qun/</id>
+    <published>2021-06-30T15:20:27.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;先从实践开始吧&quot;&gt;&lt;a href=&quot;#先从实践开始吧&quot; class=&quot;headerlink&quot; title=&quot;先从实践开始吧&quot;&gt;&lt;/a&gt;先从实践开始吧&lt;/h1&gt;&lt;p&gt;这是一个比较烧钱的方法， 我直接在腾讯云上开了两台双核4G的centos服务器。</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Kubernetes学习笔记1-容器编排</title>
+    <link href="https://skykens.github.io/kubernetes-xue-xi-bi-ji-1-rong-qi-bian-pai/"/>
+    <id>https://skykens.github.io/kubernetes-xue-xi-bi-ji-1-rong-qi-bian-pai/</id>
+    <published>2021-06-30T15:20:27.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Kubernetes中的进程组—Pod&quot;&gt;&lt;a href=&quot;#Kubernetes中的进程组—Pod&quot; class=&quot;headerlink&quot; title=&quot;Kubernetes中的进程组—Pod&quot;&gt;&lt;/a&gt;Kubernetes中的进程组—Pod&lt;/h1&gt;&lt;h1</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Docker深入理解</title>
+    <link href="https://skykens.github.io/docker-shen-ru-li-jie/"/>
+    <id>https://skykens.github.io/docker-shen-ru-li-jie/</id>
+    <published>2021-06-27T10:20:27.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;| 知识来自于极客时间 张磊老师的《深入剖析Kubernetes》，这里是作为学习笔记存放。&lt;/p&gt;
+&lt;h1 id=&quot;Docker-深入理解&quot;&gt;&lt;a href=&quot;#Docker-深入理解&quot; class=&quot;headerlink&quot; title=&quot;Docker</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>关于CI/CD 持续部署、交付的一些想法吧</title>
+    <link href="https://skykens.github.io/guan-yu-cicd-chi-xu-bu-shu-jiao-fu-de-yi-xie-xiang-fa-ba/"/>
+    <id>https://skykens.github.io/guan-yu-cicd-chi-xu-bu-shu-jiao-fu-de-yi-xie-xiang-fa-ba/</id>
+    <published>2021-06-03T10:20:27.000Z</published>
+    <updated>2023-03-23T15:31:40.703Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;关于CI-CD-持续部署、交付的一些想法吧&quot;&gt;&lt;a href=&quot;#关于CI-CD-持续部署、交付的一些想法吧&quot; class=&quot;headerlink&quot; title=&quot;关于CI/CD 持续部署、交付的一些想法吧&quot;&gt;&lt;/a&gt;关于CI/CD</summary>
+        
+      
+    
+    
+    
+    <category term="devops" scheme="https://skykens.github.io/categories/devops/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>2021-5-14 晴. 重新连接</title>
+    <link href="https://skykens.github.io/2021-5-14-qing-chong-xin-lian-jie/"/>
+    <id>https://skykens.github.io/2021-5-14-qing-chong-xin-lian-jie/</id>
+    <published>2021-05-14T16:22:46.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;阔别一年，重新开始写博客&quot;&gt;&lt;a href=&quot;#阔别一年，重新开始写博客&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="日志" scheme="https://skykens.github.io/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>容器相关名词解释</title>
+    <link href="https://skykens.github.io/rong-qi-xiang-guan-ming-ci-jie-shi/"/>
+    <id>https://skykens.github.io/rong-qi-xiang-guan-ming-ci-jie-shi/</id>
+    <published>2021-05-06T10:09:21.000Z</published>
+    <updated>2023-03-23T15:31:40.703Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;容器相关名词解释&quot;&gt;&lt;a href=&quot;#容器相关名词解释&quot; class=&quot;headerlink&quot; title=&quot;容器相关名词解释&quot;&gt;&lt;/a&gt;容器相关名词解释&lt;/h1&gt;&lt;h2 id=&quot;Helm-和-Chart&quot;&gt;&lt;a href=&quot;#Helm-和-Chart&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>C++后台开发环境部署</title>
+    <link href="https://skykens.github.io/c-bian-yi-huan-jing-bu-shu/"/>
+    <id>https://skykens.github.io/c-bian-yi-huan-jing-bu-shu/</id>
+    <published>2021-04-26T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;C-后台开发环境部署&quot;&gt;&lt;a href=&quot;#C-后台开发环境部署&quot; class=&quot;headerlink&quot; title=&quot;C++ 后台开发环境部署&quot;&gt;&lt;/a&gt;C++ 后台开发环境部署&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt; 记录C++</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Git 使用笔记</title>
+    <link href="https://skykens.github.io/git-shi-yong-bi-ji/"/>
+    <id>https://skykens.github.io/git-shi-yong-bi-ji/</id>
+    <published>2021-04-26T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Git使用&quot;&gt;&lt;a href=&quot;#Git使用&quot; class=&quot;headerlink&quot; title=&quot;Git使用&quot;&gt;&lt;/a&gt;Git使用&lt;/h1&gt;&lt;h1 id=&quot;GIT&quot;&gt;&lt;a href=&quot;#GIT&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="VCS" scheme="https://skykens.github.io/categories/VCS/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>docker 入门笔记</title>
+    <link href="https://skykens.github.io/docker-ru-men-bi-ji/"/>
+    <id>https://skykens.github.io/docker-ru-men-bi-ji/</id>
+    <published>2021-04-26T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;docker&quot;&gt;&lt;a href=&quot;#docker&quot; class=&quot;headerlink&quot; title=&quot;docker&quot;&gt;&lt;/a&gt;docker&lt;/h1&gt;&lt;h1 id=&quot;Docker使用&quot;&gt;&lt;a href=&quot;#Docker使用&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>k8s 日常笔记</title>
+    <link href="https://skykens.github.io/k8s-ri-chang-bi-ji/"/>
+    <id>https://skykens.github.io/k8s-ri-chang-bi-ji/</id>
+    <published>2021-04-26T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;k8s&quot;&gt;&lt;a href=&quot;#k8s&quot; class=&quot;headerlink&quot; title=&quot;k8s&quot;&gt;&lt;/a&gt;k8s&lt;/h1&gt;&lt;h1 id=&quot;K8S学习笔记&quot;&gt;&lt;a href=&quot;#K8S学习笔记&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="云原生" scheme="https://skykens.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>后台日常笔记</title>
+    <link href="https://skykens.github.io/hou-tai-ri-chang-bi-ji/"/>
+    <id>https://skykens.github.io/hou-tai-ri-chang-bi-ji/</id>
+    <published>2021-04-26T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.703Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;k8s&lt;br&gt;sidecar ： istio-proxy &lt;/p&gt;
+&lt;p&gt;配置&lt;br&gt;docker&lt;/p&gt;
+&lt;p&gt;后台：整体概念： 处理什么事情 - &amp;gt; 转发、路由（主流怎么用 ）-&amp;gt;&lt;/p&gt;
+&lt;h1 id=&quot;主要内容&quot;&gt;&lt;a href=&quot;#主要内容&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="日志" scheme="https://skykens.github.io/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ 知识库</title>
+    <link href="https://skykens.github.io/rabbitmq/"/>
+    <id>https://skykens.github.io/rabbitmq/</id>
+    <published>2021-04-16T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;RabbitMq&quot;&gt;&lt;a href=&quot;#RabbitMq&quot; class=&quot;headerlink&quot; title=&quot;RabbitMq&quot;&gt;&lt;/a&gt;RabbitMq&lt;/h1&gt;&lt;h2 id=&quot;基础&quot;&gt;&lt;a href=&quot;#基础&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="消息队列" scheme="https://skykens.github.io/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Shell脚本编写笔记</title>
+    <link href="https://skykens.github.io/shell-jiao-ben-bian-xie-bi-ji/"/>
+    <id>https://skykens.github.io/shell-jiao-ben-bian-xie-bi-ji/</id>
+    <published>2021-04-06T19:37:01.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Shell脚本编写笔记&quot;&gt;&lt;a href=&quot;#Shell脚本编写笔记&quot; class=&quot;headerlink&quot; title=&quot;Shell脚本编写笔记&quot;&gt;&lt;/a&gt;Shell脚本编写笔记&lt;/h1&gt;&lt;h2 id=&quot;读取外部输入&quot;&gt;&lt;a href=&quot;#读取外部输入&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="https://skykens.github.io/categories/Linux/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>muduo网络库的实现(1)</title>
+    <link href="https://skykens.github.io/muduo-wang-luo-ku-de-shi-xian-1/"/>
+    <id>https://skykens.github.io/muduo-wang-luo-ku-de-shi-xian-1/</id>
+    <published>2020-06-10T10:10:35.000Z</published>
+    <updated>2023-03-23T15:31:40.699Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h1&gt;&lt;p&gt;通过绑定回调函数的办法实现当请求到来的时候可以响应业务代码，避免侵入底层网络库。&lt;/p&gt;
+&lt;h1 id=&quot;常用模型&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="服务器框架" scheme="https://skykens.github.io/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>skylu网络库 开发日志</title>
+    <link href="https://skykens.github.io/skylu-wang-luo-ku-kai-fa-ri-zhi/"/>
+    <id>https://skykens.github.io/skylu-wang-luo-ku-kai-fa-ri-zhi/</id>
+    <published>2020-04-26T21:57:00.000Z</published>
+    <updated>2020-04-30T22:59:27.000Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;skylu网络库&quot;&gt;&lt;a href=&quot;#skylu网络库&quot; class=&quot;headerlink&quot; title=&quot;skylu网络库&quot;&gt;&lt;/a&gt;skylu网络库&lt;/h1&gt;&lt;p&gt;主要参考sylar和handy的实现&lt;/p&gt;
+&lt;h1 id=&quot;时间戳&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="服务器框架" scheme="https://skykens.github.io/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>C++ 11 新特性（1）智能指针（转）</title>
+    <link href="https://skykens.github.io/c-11-xin-te-xing-1-zhi-neng-zhi-zhen-zhuan/"/>
+    <id>https://skykens.github.io/c-11-xin-te-xing-1-zhi-neng-zhi-zhen-zhuan/</id>
+    <published>2020-04-23T21:27:43.000Z</published>
+    <updated>2020-04-23T21:47:00.000Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h1&gt;&lt;p&gt;众所周知 ，指针是C/C++ 最大的特点，同时也是C/C++</summary>
+        
+      
+    
+    
+    
+    <category term="C++" scheme="https://skykens.github.io/categories/C/"/>
+    
+    
+  </entry>
+  
+</feed>
